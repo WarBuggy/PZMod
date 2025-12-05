@@ -1,0 +1,6 @@
+version=1
+id=3616947250
+title=Mark Corpse
+description=Double click to mark/unmark a corpse and sorting the corpses for easier looting
+tags=Build 42;QoL
+visibility=public

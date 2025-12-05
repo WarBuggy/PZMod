@@ -1,0 +1,9 @@
+name=Buggy's Custom Categories
+id=BuggysCustomCategories
+description=A personal set of custom categories tailoring a specific sorting style
+author=Buggy
+modversion=0.0.1
+versionMin=42.12.3
+poster=poster.png
+icon=icon.png
+tags=Build 42

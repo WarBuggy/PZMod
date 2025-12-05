@@ -1,0 +1,9 @@
+name=Mark Corpse
+id=MarkCorpse
+description=Double click to mark/unmark a corpse and sorting the corpses for easier looting
+author=Buggy
+modversion=0.0.1
+versionMin=42.12.3
+poster=poster.png
+icon=icon.png
+tags=Build 42,QoL
