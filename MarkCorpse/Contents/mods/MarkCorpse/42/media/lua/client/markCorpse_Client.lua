@@ -22,7 +22,7 @@ end
 -- Helper: create a yellow overlay for a button
 local function createButtonOverlay(button)
     local overlay = ISPanel:new(0, 0, button:getWidth(), button:getHeight())
-    overlay.backgroundColor = { r = 1, g = 1, b = 0, a = 0.6 } -- yellow
+    overlay.backgroundColor = { r = 1, g = 1, b = 0, a = 0.4 } -- yellow
     overlay:initialise()
     overlay:instantiate()
     overlay.onMouseDown = function() return false end

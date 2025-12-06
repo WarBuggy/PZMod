@@ -1,10 +1,11 @@
+Double click to mark/unmark a corpse and sorting the corpses for easier looting
 [list]
 [*]Double-click a corpse icon in the loot window to mark or unmark it with a yellow tint.
 [*]Automatically reorder loot window icons for clarity:
 [olist]
-[*]Unmarked corpses (normal) appear at the top, sorted by ID (last killed on top, usually).
+[*]Unmarked corpses (tinted yellow) appear at the top, sorted by ID (last killed on top, usually).
 [*]Non-corpse items remain in the middle, preserving their natural order.
-[*]Marked corpses (tinted) move to the bottom, sorted by ID (last killed on top, usually).
+[*]Marked corpses (normal, untinted) move to the bottom, sorted by ID (last killed on top, usually).
 [/olist]
 [*]Marked state for each corpse persists across game sessions.
 [/list]
@@ -12,6 +13,12 @@
 It would be great to receive feedbacks, suggestions or pointers on how to improve.
 
 Version history
+
+[b]v0.0.2[/b]
+[list]
+[*]Reverse the color of unmarked/marked corpse. Unmarked corpses are now tinted yellow (seek attention). Marked corpse are de-tinted (attention not required).
+[/list]
+
 [b]v0.0.1[/b]
 [list]
 [*]Initial release.
