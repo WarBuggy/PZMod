@@ -1,0 +1,10 @@
+name=Literary Ledger
+id=LiteraryLedger
+description=Generate ledgers tracking the locations of borrowed or sold books and literature in the world.
+author=Buggy
+modversion=0.0.1
+versionMin=42.12.3
+require=\StarlitLibrary
+poster=poster.png
+icon=icon.png
+tags=Build 42

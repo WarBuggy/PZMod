@@ -1,0 +1,5 @@
+version=0.0.1
+title=Literary Ledger
+description=Generate ledgers tracking the locations of borrowed or sold books and literature in the world
+tags=Build 42
+visibility=public
