@@ -2,7 +2,9 @@ local Reflection = require("Starlit/utils/Reflection")
 local masterZoneData = require("zoneData/masterZoneData")
 
 
-local REQUIRED_PERCENT = 0.8
+local DEFAULT_REQUIRED_THRESHOLD = 0.01
+local sandboxVars = SandboxVars.LiteraryLedger or {}
+local REQUIRED_THRESHOLD = sandboxVars.Threshold or DEFAULT_REQUIRED_THRESHOLD
 
 -- Global tables
 local allChunkIDs = {}           -- businessZoneKey -> set of chunk IDs
@@ -102,7 +104,7 @@ local function onChunkLoad(chunk)
             if not bzProgress.isReady then
                 bzProgress.loaded = bzProgress.loaded + 1
                 local percent = bzProgress.loaded / bzProgress.total
-                bzProgress.isReady = percent >= REQUIRED_PERCENT
+                bzProgress.isReady = percent >= REQUIRED_THRESHOLD
                 if bzProgress.isReady then
                     print("[DEBUG] LiteraryLedger - Business Zone Ready:", bzKey)
                 end
@@ -112,6 +114,64 @@ local function onChunkLoad(chunk)
 end
 
 Events.LoadChunk.Add(onChunkLoad)
+
+-- Containers we are interested in
+local containerTypes = {
+    "counter",
+    "shelves",
+    "cardboardbox",
+    "metal_shelves",
+    "smallbox",
+    "crate",
+    "sidetable",
+    "dresser",
+    "wardrobe",
+    "desk",
+}
+local containerTypeLookup = {}
+for _, t in ipairs(containerTypes) do
+    containerTypeLookup[t] = true
+end
+
+local roomTypes = {
+    "closet",
+    "laundry",
+    "bathroom",
+    "livingroom",
+    "kitchen",
+    "hall",
+    "garagestorage",
+    "garage",
+    "kidsbedroom",
+}
+local roomTypeLookup = {}
+for _, t in ipairs(roomTypes) do
+    roomTypeLookup[t] = true
+end
+
+local function onFillContainer(roomType, containerType, container)
+    -- loot respawn can be on but we are not interested in that
+    -- onFillContainer is called on loot respawn 
+    -- so we need to track and check only on 1st onFillContainer call
+
+    -- Only track interesting room types and container types
+    if not roomTypeLookup[roomType] then return end
+    if not containerTypeLookup[containerType] then return end
+
+
+
+    if container then
+        -- check the items in the container. If there are nothing of interest, skip
+
+        -- insert code to get chunk coord or world coord of the container here
+
+        -- get the interested items and save it to the mod's global modData
+    end
+end
+
+Events.OnFillContainer.Add(onFillContainer)
+
+
 
 -- Export tables for other scripts
 return {

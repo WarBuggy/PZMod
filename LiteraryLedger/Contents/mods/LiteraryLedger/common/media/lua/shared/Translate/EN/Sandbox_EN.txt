@@ -1,0 +1,6 @@
+Sandbox_EN = {
+        Sandbox_LiteraryLedger = "Literary Ledger",
+
+        Sandbox_LiteraryLedger_Threshold = "Chunk load threshold",
+        Sandbox_LiteraryLedger_Threshold_tooltip = "The percentage of map chunks in a zone that must be loaded before that zone's ledger can be created",
+}

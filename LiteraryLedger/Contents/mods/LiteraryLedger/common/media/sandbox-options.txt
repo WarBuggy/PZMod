@@ -1,0 +1,11 @@
+VERSION = 1,
+
+option LiteraryLedger.Threshold
+{
+    type = double,
+    min = 0.01,
+    max = 1.0,
+    default = 0.80,
+    page = LiteraryLedger,
+    translation = LiteraryLedger_Threshold,
+}
