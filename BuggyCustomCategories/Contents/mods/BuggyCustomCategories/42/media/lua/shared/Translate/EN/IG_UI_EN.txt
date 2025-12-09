@@ -1,6 +1,7 @@
 IGUI_EN = {
 	IGUI_ItemCat_BCC_Literature_ComicBook = "Literature - Comic Book Retail",
 	IGUI_ItemCat_BCC_Literature_PhotoBook = "Literature - Photo Book",
+	IGUI_ItemCat_BCC_Literature_PictureBook = "Literature - Picture Book",
 	IGUI_ItemCat_BCC_Literature_Book = "Literature - Book",
 	IGUI_ItemCat_BCC_Literature_Paperback = "Literature - Paperback",
 	IGUI_ItemCat_BCC_Literature_BookSkill = "Literature - Skill Book",

@@ -10,6 +10,7 @@ local typeRules = {
         compareByIcon = {
             { "ComicBook", "Literature_ComicBook" },
             { "Book_Photography", "Literature_PhotoBook" },
+            { "Book_Picture1", "Literature_PictureBook" },
             { "MagazineWordsearch", "Literature_Wordsearch" },
             { "MagazineCrossword", "Literature_Crossword" },
             { "Newspaper", "Literature_Newspaper" },
