@@ -1,6 +1,28 @@
 Sandbox_EN = {
         Sandbox_LiteraryLedger = "Literary Ledger",
 
-        Sandbox_LiteraryLedger_Threshold = "Chunk load threshold",
-        Sandbox_LiteraryLedger_Threshold_tooltip = "The percentage of map chunks in a zone that must be loaded before that zone's ledger can be created",
+        Sandbox_LiteraryLedger_MagazineChance = "Magazine chance"
+        Sandbox_LiteraryLedger_MagazineChance_tooltip = "The probability that a magazine will appear in a ledger page"
+
+        Sandbox_LiteraryLedger_ComicChance = "Comic book chance"
+        Sandbox_LiteraryLedger_ComicChance_tooltip = "The probability that a comic book will appear in a ledger page"
+
+        Sandbox_LiteraryLedger_NovelChance = "Paperback chance"
+        Sandbox_LiteraryLedger_NovelChance_tooltip = "The probability that a paperback will appear in a ledger page"
+
+        Sandbox_LiteraryLedger_BookPictureChance = "Picture book chance"
+        Sandbox_LiteraryLedger_BookPictureChance_tooltip = "The probability that a picture book will appear in a ledger page"
+
+        Sandbox_LiteraryLedger_BookPhotographyChance = "Photography Book chance"
+        Sandbox_LiteraryLedger_BookPhotographyChance_tooltip = "The probability that a photography book will appear in a ledger page"
+
+        Sandbox_LiteraryLedger_RPGmanualChance = "RPG Manual chance"
+        Sandbox_LiteraryLedger_RPGmanualChance_tooltip = "The probability that an RPG manual will appear in a ledger page"
+
+        Sandbox_LiteraryLedger_BookChance = "Book chance"
+        Sandbox_LiteraryLedger_BookChance_tooltip = "The probability that a generic book will appear in a ledger page"
+
+        Sandbox_LiteraryLedger_SkillBookChance = "Skill book chance"
+        Sandbox_LiteraryLedger_SkillBookChance_tooltip = "The probability that a skill book/magazine will appear in a ledger page"
+
 }

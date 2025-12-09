@@ -1,11 +1,82 @@
 VERSION = 1,
 
-option LiteraryLedger.Threshold
+option LiteraryLedger.ItemChances.Magazine
 {
     type = double,
-    min = 0.01,
+    min = 0.0,
     max = 1.0,
-    default = 0.80,
+    default = 0.2,
     page = LiteraryLedger,
-    translation = LiteraryLedger_Threshold,
+    translation = LiteraryLedger_MagazineChance,
 }
+
+option LiteraryLedger.ItemChances.Comic
+{
+    type = double,
+    min = 0.0,
+    max = 1.0,
+    default = 0.2,
+    page = LiteraryLedger,
+    translation = LiteraryLedger_ComicChance,
+}
+
+option LiteraryLedger.ItemChances.Novel
+{
+    type = double,
+    min = 0.0,
+    max = 1.0,
+    default = 0.2,
+    page = LiteraryLedger,
+    translation = LiteraryLedger_NovelChance,
+}
+
+option LiteraryLedger.ItemChances.Book_Picture
+{
+    type = double,
+    min = 0.0,
+    max = 1.0,
+    default = 0.2,
+    page = LiteraryLedger,
+    translation = LiteraryLedger_BookPictureChance,
+}
+
+option LiteraryLedger.ItemChances.Book_Photography
+{
+    type = double,
+    min = 0.0,
+    max = 1.0,
+    default = 0.2,
+    page = LiteraryLedger,
+    translation = LiteraryLedger_BookPhotographyChance,
+}
+
+option LiteraryLedger.ItemChances.RPGmanual
+{
+    type = double,
+    min = 0.0,
+    max = 1.0,
+    default = 0.2,
+    page = LiteraryLedger,
+    translation = LiteraryLedger_RPGmanualChance,
+}
+
+option LiteraryLedger.ItemChances.Book
+{
+    type = double,
+    min = 0.0,
+    max = 1.0,
+    default = 0.2,
+    page = LiteraryLedger,
+    translation = LiteraryLedger_BookChance,
+}
+
+option LiteraryLedger.ItemChances.SkillBook
+{
+    type = double,
+    min = 0.0,
+    max = 1.0,
+    default = 0.2,
+    page = LiteraryLedger,
+    translation = LiteraryLedger_SkillBookChance,
+}
+
