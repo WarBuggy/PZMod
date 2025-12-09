@@ -1,9 +1,9 @@
 local Reflection = require("Starlit/utils/Reflection")
 local masterZoneData = require("zoneData/masterZoneData")
 
--- local DEFAULT_REQUIRED_THRESHOLD = 0.01
--- local sandboxVars = SandboxVars.LiteraryLedger or {}
--- local REQUIRED_THRESHOLD = sandboxVars.Threshold or DEFAULT_REQUIRED_THRESHOLD
+
+local PAGE_NUMBER_MIN = 100
+local PAGE_NUMBER_MAX = 950
 
 local TILE_SCALE = 8  -- each width/height unit = 8 tiles
 
@@ -59,6 +59,11 @@ modData.zoneRects = modData.zoneRects or {}  -- stores pre-calculated rects
 modData.processedContainers = modData.processedContainers or {}
 modData.businessZoneItems = modData.businessZoneItems or {}
 
+local MIN_ITEMS_PER_PAGE = SandboxVars.LiteraryLedger.MinItemPerPage or 5
+local MAX_EXTRA_ITEMS_PER_PAGE = SandboxVars.LiteraryLedger.MaxExtraItems or 5 
+local MAX_ITEMS_PER_PAGE = MIN_ITEMS_PER_PAGE + MAX_EXTRA_ITEMS_PER_PAGE
+
+
 function getItemChance(category)
     return ITEM_CATEGORY_CHANCES[category] or 0
 end
@@ -94,15 +99,8 @@ local function populateZoneData()
 end
 
 local function loadCategoryChances()
-    local LL = SandboxVars.LiteraryLedger
-    if not LL or not LL.ItemChances then
-        return -- should never happen, but safe
-    end
-
-    local options = LL.ItemChances
-
     for _, key in ipairs(CATEGORY_KEYS) do
-        ITEM_CATEGORY_CHANCES[key] = options[key] or 0
+        ITEM_CATEGORY_CHANCES[key] = SandboxVars.LiteraryLedger[key] or 0
     end
 end
 
@@ -113,7 +111,6 @@ local function onGameBoot()
     populateZoneData()
     loadCategoryChances()
 end
-
 Events.OnGameBoot.Add(onGameBoot)
 
 local containerTypeLookup = {}
@@ -297,72 +294,110 @@ local function processContainerItems(container)
     return itemsOfInterest
 end
 
+local function getRandomPageNumber(bzData)
+    local maxAttempts = PAGE_NUMBER_MAX - PAGE_NUMBER_MIN
+    for i = 1, maxAttempts do
+        local n = ZombRand(PAGE_NUMBER_MIN, PAGE_NUMBER_MAX + 1)
+        if not bzData.usedPageNumbers[n] then
+            return n
+        end
+    end
+
+    -- Fallback if all attempts fail
+    return PAGE_NUMBER_MIN - #bzData.pages
+end
+
+-- Ensure the business zone data structure exists
+local function ensureBusinessZoneData(bzKey)
+    local bzData = modData.businessZoneItems[bzKey]
+    if not bzData then
+        bzData = { 
+            pages = {},             -- generated pages
+            usedPageNumbers = {},    -- numbers 100–950 already used (lookup table)
+            usedPageNumbersList = {}, -- array for random selection
+            available = {}          -- items waiting for a page
+        }
+        modData.businessZoneItems[bzKey] = bzData
+    else
+        -- Ensure usedPageNumbersList exists
+        bzData.usedPageNumbersList = bzData.usedPageNumbersList or {}
+    end
+    return bzData
+end
+
+-- Helper: create page content string from items
+local function createPageContentString(pageNumber, pageItems)
+    local lines = {}
+    table.insert(lines, "Page #" .. pageNumber)
+    
+    for _, item in ipairs(pageItems) do
+        table.insert(lines, item.name .. " - " .. item.street)
+    end
+    local contentString = table.concat(lines, "\n")  -- join all lines with newlines
+    print(contentString)
+    return contentString
+end
+
+-- Attempt to generate pages while enough items are available
+local function tryGeneratePage(bzData)
+    while #bzData.available >= MAX_ITEMS_PER_PAGE do
+        -- Randomly decide number of items for this page
+        local numItems = ZombRand(MIN_ITEMS_PER_PAGE, MAX_ITEMS_PER_PAGE + 1)
+
+        -- Get an unused page number
+        local pageNumber = getRandomPageNumber(bzData)
+
+        -- Take `numItems` randomly from the available pool
+        local pageItems = {}
+        for i = 1, numItems do
+            local idx = ZombRand(1, #bzData.available + 1)  -- random index
+            table.insert(pageItems, table.remove(bzData.available, idx))
+        end
+
+        -- Save the page
+        bzData.pages[pageNumber] = createPageContentString(pageNumber, pageItems)
+        bzData.usedPageNumbers[pageNumber] = true
+        table.insert(bzData.usedPageNumbersList, pageNumber)
+    end
+end
+
+-- Main container processing function
 local function onFillContainer(roomType, containerType, container)
     -- Ignore non-interesting room or container
-    if not roomTypeLookup[roomType] then return end
-    if not containerTypeLookup[containerType] then return end
-    if not container then return end
+    if not roomTypeLookup[roomType] or not containerTypeLookup[containerType] or not container then
+        return
+    end
 
     local cx, cy, containerIDString = getContainerInfo(container)
     if not cx or not cy or not containerIDString then return end
 
-    -- Check if container is in a business zone
     local bzKey, streetZone, subStreetZone = getZoneFromXY(cx, cy)
     if not bzKey then return end
 
-    -- If already processed, skip
-    if modData.processedContainers[containerIDString] then
-        return
-    end
-
+    if modData.processedContainers[containerIDString] then return end
     modData.processedContainers[containerIDString] = true
 
-    -- Get interesting items
     local items = processContainerItems(container)
-    if #items == 0 then
-        return
-    end
+    if #items == 0 then return end
 
-    ----------------------------------------------------------------------
-    -- Ensure business zone data exists
-    ----------------------------------------------------------------------
-    local bzData = modData.businessZoneItems[bzKey]
-    if not bzData then
-        bzData = { ready = {}, notReady = {} }
-        modData.businessZoneItems[bzKey] = bzData
-    end
+    local bzData = ensureBusinessZoneData(bzKey)
+    local streetName = streetZone and streetZone.displayName or "Unknown address"
 
-    local streetName = streetZone and streetZone.name or "Unknown address"
-
-    ----------------------------------------------------------------------
-    -- Process each item
-    ----------------------------------------------------------------------
+    -- Add items that pass the chance roll to available pool
+    local addedCount = 0
     for _, info in ipairs(items) do
-        local item = info.item
-        local category = info.category
-
-        local chance = getItemChance(category)   -- 0–1
-        local displayName = item:getDisplayName() or item:getType()
-
-        -- Roll chance
-        local roll = ZombRandFloat(0.0, 1.0)
-
-        if roll <= chance then
-            -- Successful → goes into ready list
-            table.insert(bzData.ready, {
-                name = displayName,
-                street = streetName,
-                category = category
-            })
-        else
-            -- Failed → goes into notReady list
-            table.insert(bzData.notReady, {
-                name = displayName,
-                street = streetName,
-                category = category,
-                requiredChance = chance
-            })
+        local rollResult = ZombRandFloat(0.0, 1.0)
+        local targetRoll = getItemChance(info.category)
+        if rollResult  <=  targetRoll then
+            local displayName = info.item:getDisplayName() or info.item:getType()
+            table.insert(bzData.available, { name = displayName, street = streetName })
+            addedCount = addedCount + 1
         end
+    end
+
+    -- Only attempt page generation if at least one item was added
+    if addedCount > 0 then
+        tryGeneratePage(bzData)
     end
 end
 

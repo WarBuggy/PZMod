@@ -25,4 +25,9 @@ Sandbox_EN = {
         Sandbox_LiteraryLedger_SkillBookChance = "Skill book chance"
         Sandbox_LiteraryLedger_SkillBookChance_tooltip = "The probability that a skill book/magazine will appear in a ledger page"
 
+        Sandbox_LiteraryLedger_MinItemsPerPage = "Minimum items per page",
+        Sandbox_LiteraryLedger_MinItemsPerPage_tooltip = "The minimum number of entries that must appear on each ledger page",
+
+        Sandbox_LiteraryLedger_MaxExtraItems = "Maximum extra items per page",
+        Sandbox_LiteraryLedger_MaxExtraItems_tooltip = "The maximum number of additional entries beyond the minimum that a page can hold. The max page limit is: MinItemsPerPage + MaxExtraItems. A new page will be created when available items reach or exceed this limit",
 }

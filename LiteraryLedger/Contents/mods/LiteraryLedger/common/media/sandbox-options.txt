@@ -1,6 +1,6 @@
 VERSION = 1,
 
-option LiteraryLedger.ItemChances.Magazine
+option LiteraryLedger.Magazine
 {
     type = double,
     min = 0.0,
@@ -10,7 +10,7 @@ option LiteraryLedger.ItemChances.Magazine
     translation = LiteraryLedger_MagazineChance,
 }
 
-option LiteraryLedger.ItemChances.Comic
+option LiteraryLedger.Comic
 {
     type = double,
     min = 0.0,
@@ -20,7 +20,7 @@ option LiteraryLedger.ItemChances.Comic
     translation = LiteraryLedger_ComicChance,
 }
 
-option LiteraryLedger.ItemChances.Novel
+option LiteraryLedger.Novel
 {
     type = double,
     min = 0.0,
@@ -30,7 +30,7 @@ option LiteraryLedger.ItemChances.Novel
     translation = LiteraryLedger_NovelChance,
 }
 
-option LiteraryLedger.ItemChances.Book_Picture
+option LiteraryLedger.Book_Picture
 {
     type = double,
     min = 0.0,
@@ -40,7 +40,7 @@ option LiteraryLedger.ItemChances.Book_Picture
     translation = LiteraryLedger_BookPictureChance,
 }
 
-option LiteraryLedger.ItemChances.Book_Photography
+option LiteraryLedger.Book_Photography
 {
     type = double,
     min = 0.0,
@@ -50,7 +50,7 @@ option LiteraryLedger.ItemChances.Book_Photography
     translation = LiteraryLedger_BookPhotographyChance,
 }
 
-option LiteraryLedger.ItemChances.RPGmanual
+option LiteraryLedger.RPGmanual
 {
     type = double,
     min = 0.0,
@@ -60,7 +60,7 @@ option LiteraryLedger.ItemChances.RPGmanual
     translation = LiteraryLedger_RPGmanualChance,
 }
 
-option LiteraryLedger.ItemChances.Book
+option LiteraryLedger.Book
 {
     type = double,
     min = 0.0,
@@ -70,7 +70,7 @@ option LiteraryLedger.ItemChances.Book
     translation = LiteraryLedger_BookChance,
 }
 
-option LiteraryLedger.ItemChances.SkillBook
+option LiteraryLedger.SkillBook
 {
     type = double,
     min = 0.0,
@@ -80,3 +80,22 @@ option LiteraryLedger.ItemChances.SkillBook
     translation = LiteraryLedger_SkillBookChance,
 }
 
+option LiteraryLedger.MinItemsPerPage
+{
+    type = integer,
+    min = 1,
+    max = 20,
+    default = 5,
+    page = LiteraryLedger,
+    translation = LiteraryLedger_MinItemsPerPage,
+}
+
+option LiteraryLedger.MaxExtraItems
+{
+    type = integer,
+    min = 0,
+    max = 20,
+    default = 5,
+    page = LiteraryLedger,
+    translation = LiteraryLedger_MaxExtraItems,
+}
