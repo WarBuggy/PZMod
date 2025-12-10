@@ -1,11 +1,7 @@
-local Reflection = require("Starlit/utils/Reflection")
 local masterZoneData = require("zoneData/masterZoneData")
-
 
 local PAGE_NUMBER_MIN = 100
 local PAGE_NUMBER_MAX = 950
-
-local TILE_SCALE = 8  -- each width/height unit = 8 tiles
 
 -- Containers we are interested in
 local CONTAINER_TYPES = {
@@ -53,9 +49,7 @@ local CATEGORY_KEYS = {
 ITEM_CATEGORY_CHANCES = {}
 
 -- Persistent mod data
-local globalModDataName = "BuggyLiteraryLedgerModData"
-local modData = ModData.getOrCreate(globalModDataName)
-modData.zoneRects = modData.zoneRects or {}  -- stores pre-calculated rects
+local modData = ModData.getOrCreate(masterZoneData.globalModDataName)
 modData.processedContainers = modData.processedContainers or {}
 modData.businessZoneItems = modData.businessZoneItems or {}
 
@@ -63,38 +57,43 @@ local MIN_ITEMS_PER_PAGE = SandboxVars.LiteraryLedger.MinItemPerPage or 5
 local MAX_EXTRA_ITEMS_PER_PAGE = SandboxVars.LiteraryLedger.MaxExtraItems or 5 
 local MAX_ITEMS_PER_PAGE = MIN_ITEMS_PER_PAGE + MAX_EXTRA_ITEMS_PER_PAGE
 
+local zoneRects = {}  -- stores pre-calculated zone rects
+local lootZoneRects = {}  -- stores pre-calculated loot zone rects
 
 function getItemChance(category)
     return ITEM_CATEGORY_CHANCES[category] or 0
 end
 
--- Helper to calculate real rectangle of a sub-zone
-local function getSubZoneRealRect(subZone)
-    local x1 = subZone.wx * 8
-    local y1 = subZone.wy * 8 + 7
-    return {
-        x1 = x1,
-        y1 = y1,
-        x2 = x1 + (subZone.width * TILE_SCALE),
-        y2 = y1 - (subZone.height * TILE_SCALE)
-    }
-end
-
 -- Populate all zones and pre-calculate rectangles
 local function populateZoneData()
     local allBusinessZones = masterZoneData.allBusinessZones
-
+    
     for bzKey, bz in pairs(allBusinessZones) do
-        modData.zoneRects[bzKey] = {}
+        zoneRects[bzKey] = {}
 
         for streetIndex, street in ipairs(bz.streetZones) do
-            modData.zoneRects[bzKey][streetIndex] = {}
+            zoneRects[bzKey][streetIndex] = {}
 
             for subIndex, sub in ipairs(street.subStreetZones) do
-                local rect = getSubZoneRealRect(sub)
-                modData.zoneRects[bzKey][streetIndex][subIndex] = rect
+                local rect = masterZoneData.getSubZoneRealRect(sub)
+                zoneRects[bzKey][streetIndex][subIndex] = rect
             end
         end
+    end
+
+    for lzKey, lz in pairs(masterZoneData.allLootZones) do
+        local rects = {}
+
+        for subIndex, subZone in ipairs(lz.loot_subZones) do
+            local rect = masterZoneData.getSubZoneRealRect(subZone)
+            table.insert(rects, rect)
+        end
+
+        -- Store both rectangles and business zone keys
+        lootZoneRects[lzKey] = {
+            rects = rects,
+            bzKeys = lz.bzKeys or {}
+        }
     end
 end
 
@@ -187,11 +186,6 @@ local function getContainerInfo(container)
     )
 end
 
--- Helper: Check if point (x, y) is inside rectangle
-local function pointInRect(x, y, rect)
-    return x >= rect.x1 and x <= rect.x2 and y <= rect.y1 and y >= rect.y2
-end
-
 -- Returns a random element from a non-empty array
 local function chooseRandomItem(array)
     if not array or #array == 0 then
@@ -208,8 +202,8 @@ local function getZoneFromXY(x, y)
     for bzKey, bz in pairs(masterZoneData.allBusinessZones) do
         for streetIndex, street in ipairs(bz.streetZones) do
             for subIndex, sub in ipairs(street.subStreetZones) do
-                local rect = modData.zoneRects[bzKey][streetIndex][subIndex]
-                if rect and pointInRect(x, y, rect) then
+                local rect = zoneRects[bzKey][streetIndex][subIndex]
+                if rect and masterZoneData.pointInRect(x, y, rect) then
                     candidate = { street = street, sub = sub }
                     break
                 end
@@ -304,7 +298,7 @@ local function getRandomPageNumber(bzData)
     end
 
     -- Fallback if all attempts fail
-    return PAGE_NUMBER_MIN - #bzData.pages
+    return PAGE_NUMBER_MAX + #bzData.pages
 end
 
 -- Ensure the business zone data structure exists
@@ -402,3 +396,59 @@ local function onFillContainer(roomType, containerType, container)
 end
 
 Events.OnFillContainer.Add(onFillContainer)
+
+local function findLootZoneFromXY(x, y)
+    for _, lzData in pairs(lootZoneRects) do
+        for _, rect in ipairs(lzData.rects) do
+            if rect and masterZoneData.pointInRect(x, y, rect) then
+                return lzData
+            end
+        end
+    end
+    return nil
+end
+
+local function lootHandler(zombie)
+    if not zombie then return end
+
+    local square = zombie:getSquare()
+    if not square then return end
+
+    local x = square:getX()
+    local y = square:getY()
+
+    -- Determine which loot zone the zombie is in
+    local lzData = findLootZoneFromXY(x, y)
+    if not lzData then return end
+
+    -- Choose a random business zone key associated with this loot zone
+    local chosenBZKey
+    if #lzData.bzKeys > 0 then
+        chosenBZKey = lzData.bzKeys[1 + ZombRand(#lzData.bzKeys)]
+    else 
+        return 
+    end
+
+    -- Get the corpse inventory
+    local inv = zombie:getInventory()
+    if not inv then return end
+
+    -- Add a test item (can remove later)
+    inv:AddItem("Base.BaseballBat_Can")
+
+    -- Add the ledger page
+    local item = inv:AddItem("Base.LiteraryLedgerPage")
+
+    -- Generate page number dynamically if needed, here using random for now
+    local pageNumber = 1 + ZombRand(1000)
+
+    item:setName("Ledger page #" .. pageNumber)
+    item:setDisplayCategory("LL_DisplayCategory_" .. chosenBZKey)
+                             
+    -- Optional: save bzKey and pageNumber in modData for retrieval later
+    local md = item:getModData()
+    md.BZKey = chosenBZKey
+    md.PageNumber = pageNumber
+end
+
+Events.OnZombieDead.Add(lootHandler)

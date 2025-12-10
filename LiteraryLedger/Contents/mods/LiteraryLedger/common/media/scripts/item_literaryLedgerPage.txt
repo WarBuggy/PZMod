@@ -1,0 +1,11 @@
+module Base
+{
+    item LiteraryLedgerPage
+    {
+        Weight  =   0.1,
+        Type    =   Normal,
+        IconsForTexture = Note1;Note2,
+        StaticModelsByIndex = Note1;Note2,
+        WorldStaticModelsByIndex = Note1;Note2,
+    }
+}

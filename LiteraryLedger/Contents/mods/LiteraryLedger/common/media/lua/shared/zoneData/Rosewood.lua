@@ -44,6 +44,19 @@ local businessZone_Rosewood_SchoolLib = {
     },
 }
 
+local loot_subZone_Rosewood_001 = { wx = 992, wy = 1567, width = 70, height = 160 }
+
+local loot_zone_Rosewood = {
+    key = "Rosewood",
+    bzKeys = {
+        businessZone_Rosewood_BookNaked.key,
+        businessZone_Rosewood_SchoolLib.key,
+    },
+    loot_subZones = {
+        loot_subZone_Rosewood_001,
+    },
+}
+
 -------------------------------------
 -- Export keyed business zones
 -------------------------------------
@@ -52,6 +65,14 @@ local businessZones = {
     [businessZone_Rosewood_SchoolLib.key] = businessZone_Rosewood_SchoolLib,
 }
 
+-------------------------------------
+-- Export keyed loot zones
+-------------------------------------
+local lootZones = {
+    [loot_zone_Rosewood.key] = loot_zone_Rosewood,
+}
+
 return {
-    businessZones = businessZones
+    businessZones = businessZones,
+    lootZones = lootZones,
 }
